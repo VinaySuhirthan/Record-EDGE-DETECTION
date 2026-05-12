@@ -1,25 +1,12 @@
-# Image Smoothing and Sharpening Using OpenCV
+# Edge-Detection-opencv
 
 ## Aim
 
-To write a Python program using OpenCV to apply different smoothing filters (Averaging, Weighted Averaging, Gaussian, Median) and sharpening filters (Laplacian Kernel and Laplacian Operator) for image enhancement, and display each result separately along with the original image for comparison.
+To perform edge detection using Sobel, Roberts, Prewitt, Laplacian, and Canny edge detectors.
 
 ---
 
-## The program performs the following operations:
-
-- Read and display an input image  
-- Apply Averaging filter  
-- Apply Weighted Averaging filter  
-- Apply Gaussian filter  
-- Apply Median filter  
-- Apply Laplacian sharpening using kernel  
-- Apply Laplacian operator  
-- Display all outputs for comparison  
-
----
-
-##  Software Used
+## Software Required
 
 - Anaconda – Python 3.7  
 - Jupyter Notebook / VS Code  
@@ -29,170 +16,148 @@ To write a Python program using OpenCV to apply different smoothing filters (Ave
 
 ---
 
-##  Algorithm
+## ⚙️ Algorithm
 
 ### Step 1:
-Import the required libraries: OpenCV, NumPy, and Matplotlib.
+Import all the necessary modules for the program.
 
 ### Step 2:
-Read the input image (e.g., `image.jpg`).
+Load an image using `cv2.imread()`.
 
 ### Step 3:
-Convert the image from BGR to RGB format for display.
+Convert the image to grayscale.
 
 ### Step 4:
-Apply Averaging Filter using `cv2.blur()`.
+Apply **Sobel operator** using OpenCV to detect edges.
 
 ### Step 5:
-Apply Weighted Averaging Filter using a custom kernel with `cv2.filter2D()`.
+Apply **Prewitt operator** using custom kernels.
 
 ### Step 6:
-Apply Gaussian Filter using `cv2.GaussianBlur()`.
+Apply **Roberts operator** using custom kernels.
 
 ### Step 7:
-Apply Median Filter using `cv2.medianBlur()`.
+Apply **Laplacian operator** using OpenCV.
 
 ### Step 8:
-Apply Laplacian Sharpening using Kernel with `cv2.filter2D()`.
+Apply **Canny edge detector** using OpenCV.
 
 ### Step 9:
-Convert image to grayscale and apply Laplacian Operator using `cv2.Laplacian()`.
-
-### Step 10:
-Display all filtered images using a grid layout for comparison.
+Display all edge-detected images for comparison.
 
 ---
-## Program: 
+## PROGRAM:
+
 ### Developed By
+
 - **Name:** K S Vinay Suhirthan
 - **Register No:** 212224230305
 
 ---
-### 1. Smoothing Filters
-i) Using Averaging Filter
 ```py
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-image1=cv2.imread("mk.jpeg")
-image2=cv2.cvtColor(image1,cv2.COLOR_BGR2RGB)
-kernel=np.ones((11,11),np.float32)/169
-image3=cv2.filter2D(image2,-1,kernel)
-plt.figure(figsize=(9,9))
-plt.subplot(1,2,1)
-plt.imshow(image2)
-plt.title("Original Image")
+import matplotlib.pyplot as plt
+
+# Load image
+image = cv2.imread('Fish.jpg')  # replace with your path
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+# ---------------- SOBEL ----------------
+sobel_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=5)
+sobel_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=5)
+sobel = cv2.magnitude(sobel_x, sobel_y)
+
+# ---------------- PREWITT ----------------
+prewitt_x = np.array([[1, 0, -1],
+                      [1, 0, -1],
+                      [1, 0, -1]])
+
+prewitt_y = np.array([[1, 1, 1],
+                      [0, 0, 0],
+                      [-1, -1, -1]])
+
+prewitt_x_edge = cv2.filter2D(gray, -1, prewitt_x)
+prewitt_y_edge = cv2.filter2D(gray, -1, prewitt_y)
+prewitt = cv2.magnitude(prewitt_x_edge.astype(np.float32),
+                        prewitt_y_edge.astype(np.float32))
+
+# ---------------- ROBERTS ----------------
+roberts_x = np.array([[1, 0],
+                      [0, -1]])
+
+roberts_y = np.array([[0, 1],
+                      [-1, 0]])
+
+roberts_x_edge = cv2.filter2D(gray, -1, roberts_x)
+roberts_y_edge = cv2.filter2D(gray, -1, roberts_y)
+roberts = cv2.magnitude(roberts_x_edge.astype(np.float32),
+                        roberts_y_edge.astype(np.float32))
+
+# ---------------- LAPLACIAN ----------------
+laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+
+# ---------------- CANNY ----------------
+canny = cv2.Canny(gray, 50, 150)
+
+# ---------------- DISPLAY ----------------
+plt.figure(figsize=(12, 10))
+
+plt.subplot(2, 3, 1)
+plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+plt.title("Original")
 plt.axis("off")
-plt.subplot(1,2,2)
-plt.imshow(image3)
-plt.title("Average Filter Image")
+
+plt.subplot(2, 3, 2)
+plt.imshow(sobel, cmap='gray')
+plt.title("Sobel")
 plt.axis("off")
+
+plt.subplot(2, 3, 3)
+plt.imshow(prewitt, cmap='gray')
+plt.title("Prewitt")
+plt.axis("off")
+
+plt.subplot(2, 3, 4)
+plt.imshow(roberts, cmap='gray')
+plt.title("Roberts")
+plt.axis("off")
+
+plt.subplot(2, 3, 5)
+plt.imshow(laplacian, cmap='gray')
+plt.title("Laplacian")
+plt.axis("off")
+
+plt.subplot(2, 3, 6)
+plt.imshow(canny, cmap='gray')
+plt.title("Canny")
+plt.axis("off")
+
+plt.tight_layout()
 plt.show()
 ```
+## Output
 
-ii) Using Weighted Averaging Filter
-```py
-kernel1=np.array([[1,2,1],[2,4,2],[1,2,1]])/16
-image2=cv2.cvtColor(image1,cv2.COLOR_BGR2RGB)
-image3=cv2.filter2D(image2,-1,kernel1)
-plt.subplot(1,2,1)
-plt.imshow(image2)
-plt.title("Original Image")
-plt.axis("off")
-plt.subplot(1,2,2)
-plt.imshow(image3)
-plt.title("Weighted Average Filter Image")
-plt.axis("off")
-plt.show()
-```
+### Original
+<img width="838" height="691" alt="image" src="https://github.com/user-attachments/assets/f63e22ad-e290-4368-898f-3be8fe164fb6" />
 
-iii) Using Gaussian Filter
-```py
-gaussian_blur=cv2.GaussianBlur(image2,(33,33),0,0)
-plt.subplot(1,2,1)
-plt.imshow(image2)
-plt.title("Original Image")
-plt.axis("off")
-plt.subplot(1,2,2)
-plt.imshow(gaussian_blur)
-plt.title("Gaussian Blur")
-plt.axis("off")
-plt.show()
-```
 
-iv)Using Median Filter
-```py
-median=cv2.medianBlur(image2,13)
-plt.figure(figsize=(9,9))
-plt.subplot(1,2,1)
-plt.imshow(image2)
-plt.title("Original Image")
-plt.axis("off")
-plt.subplot(1,2,2)
-plt.imshow(median)
-plt.title("Median Blur")
-plt.axis("off")
-plt.show()
-```
-### 2. Sharpening Filters
-i) Using Laplacian Linear Kernal
-```py
-kernel2=np.array([[-1,-1,-1],[2,-2,1],[2,1,-1]])
-image3=cv2.filter2D(image2,-1,kernel2)
-plt.subplot(1,2,1)
-plt.imshow(image2)
-plt.title("Original Image")
-plt.axis("off")
-plt.subplot(1,2,2)
-plt.imshow(image3)
-plt.title("Laplacian Kernel")
-plt.axis("off")
-plt.show()
-```
+###  Sobel Edge Detector
+<img width="838" height="691" alt="image" src="https://github.com/user-attachments/assets/a26ef730-45b9-4115-a059-fc24ceac0fd7" />
 
-ii) Using Laplacian Operator
-```py
-laplacian=cv2.Laplacian(image2,cv2.CV_64F)
-plt.subplot(1,2,1)
-plt.imshow(image2)
-plt.title("Original Image")
-plt.axis("off")
-plt.subplot(1,2,2)
-plt.imshow(laplacian)
-plt.title("Laplacian Operator")
-plt.axis("off")
-plt.show()
-```
+###  Prewitt Edge Detector
+<img width="845" height="684" alt="image" src="https://github.com/user-attachments/assets/001cc94d-b419-4364-8b68-f76869e79537" />
 
-##  Output
 
-### Smoothing Filters
+###  Roberts Edge Detector
+<img width="876" height="691" alt="image" src="https://github.com/user-attachments/assets/527d4ac4-7ead-4017-8c7b-3a39bdb58bff" />
 
-- Averaging filter produces blurred image
-  <img width="909" height="280" alt="image" src="https://github.com/user-attachments/assets/b213dd7f-a300-4444-932f-dd01bdf41fc6" />
+###  Laplacian Edge Detector
+<img width="838" height="691" alt="image" src="https://github.com/user-attachments/assets/4f1c302f-47ff-48c2-893f-65129ecee6bd" />
 
-- Weighted averaging provides smoother result with less distortion
-  <img width="931" height="307" alt="image" src="https://github.com/user-attachments/assets/206034d3-6556-447b-b942-f8e9740fe037" />
+###  Canny Edge Detector
+<img width="838" height="691" alt="image" src="https://github.com/user-attachments/assets/2f954137-a91f-4414-9dc1-1bab8208e310" />
 
-- Gaussian filter preserves edges better while reducing noise
-  <img width="923" height="324" alt="image" src="https://github.com/user-attachments/assets/831e31c8-0c23-4426-8257-be0806988f72" />
- 
-- Median filter removes salt-and-pepper noise effectively  
-<img width="930" height="320" alt="image" src="https://github.com/user-attachments/assets/67a05aab-d697-4bb5-92d0-203ce7eb4fb3" />
+## Result
 
-###  Sharpening Filters
-
-- Laplacian kernel enhances edges and fine details
-  <img width="936" height="322" alt="image" src="https://github.com/user-attachments/assets/8b893bf1-37fb-4fae-8a86-40208a1fe622" />
-
-  
-- Laplacian operator detects edges clearly in grayscale  
-<img width="932" height="319" alt="image" src="https://github.com/user-attachments/assets/43b5be69-3991-4bc1-87aa-619e13b285c4" />
-
----
-
-##  Result
-
-Thus, smoothing filters and sharpening filters are successfully implemented using OpenCV.
-
-The smoothing filters reduce noise and improve image quality, while sharpening filters enhance edges and details for better feature extraction.
+Thus, edges are successfully detected using Sobel, Prewitt, Roberts, Laplacian, and Canny edge detection techniques. Each method highlights edges differently based on gradient and intensity variations, improving feature extraction and analysis.
